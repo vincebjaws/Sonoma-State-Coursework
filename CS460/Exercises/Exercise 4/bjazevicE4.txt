@@ -1,0 +1,37 @@
+1.
+The sum of the unsorted values is: 12299296505.2779998779
+The sum of the descending values is: 12299296505.2780017853
+The sum of the ascending values is: 12299296505.2779998779
+In ascending order, the values are: 
+         0.1025000000
+         1.0500000000
+         2.2050000000
+         5.3075000000
+  41256375.0000000000
+1231243750.0999999046
+3213750120.3074998856
+3456312750.2049999237
+4356733501.0004997253
+
+2.
+This input seems correct.
+
+3.
+The sum of the unsorted values is: 12299296768.0000000000
+The sum of the descending values is: 12299295744.0000000000
+The sum of the ascending values is: 12299296768.0000000000
+In ascending order, the values are: 
+         0.1024999991
+         1.0499999523
+         2.2049999237
+         5.3074998856
+  41256376.0000000000
+1231243776.0000000000
+3213750016.0000000000
+3456312832.0000000000
+4356733440.0000000000
+
+The output is different number values outputed are different. Because floats have less of an accuracy, float go up to an accuracy of 6 by default
+
+5.
+Python has abitrary percision implmented to a deeper accuaracy degree. C++ has a percission of 64-bit. But python represents as big num or 2**30, for way larger accuracy ratings
