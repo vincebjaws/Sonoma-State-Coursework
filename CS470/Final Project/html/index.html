@@ -1,0 +1,366 @@
+<html>
+<head>
+<title>CS 470 Final Project</title>
+<link href='http://fonts.googleapis.com/css?family=Nunito:300|Crimson+Text|Droid+Sans+Mono' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" title="Default" href="styles/github.css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js"></script>  
+
+<link rel="stylesheet" href="highlighting/styles/default.css">
+<script src="highlighting/highlight.pack.js"></script>
+
+<style type="text/css">
+body {
+	margin: 0px;
+	width: 100%;
+	font-family: 'Crimson Text', serif;
+	font-size: 20px;
+	background: #fcfcfc;
+}
+h1 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 28px;
+	margin: 25px 0px 0px 0px;
+	text-transform: lowercase;
+
+}
+
+h2 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 32px;
+	margin: 15px 0px 35px 0px;
+	color: #333;	
+	word-spacing: 3px;
+}
+
+h3 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 26px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+h4 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 22px;
+	margin: 10px 0px 10px 0px;
+	color: #333;
+	word-spacing: 2px;
+}
+
+h5 {
+	font-family: 'Nunito', sans-serif;
+	font-weight: normal;
+	font-size: 18px;
+	margin: 10px 0px 10px 0px;
+	color: #111;
+	word-spacing: 2px;
+}
+
+p, li {
+	color: #444;
+}
+
+a {
+	color: #DE3737;
+}
+
+.container {
+	margin: 0px auto 0px auto;
+	width: 1160px;
+}
+
+#header {
+	background: #333;
+	width: 100%;
+}
+
+#headersub {
+	color: #ccc;
+	width: 960px;
+	margin: 0px auto 0px auto;
+	padding: 20px 0px 20px 0px;
+}
+
+.chart {
+	width: 480px;
+}
+.lol {
+	font-size: 16px;
+	color: #888;
+	font-style: italic;
+}
+.sep {
+	height: 1px;
+	width: 100%;
+	background: #999;
+	margin: 20px 0px 20px 0px;
+}
+.footer{
+	font-size: 16px;
+}
+.latex {
+	width: 100%;
+}
+
+.latex img {
+	display: block;
+	margin: 0px auto 0px auto;
+}
+
+pre {
+	font-family: 'Droid Sans Mono';
+	font-size: 14px;
+}
+
+table td {
+  text-align: center;
+  vertical-align: middle;
+}
+
+table td img {
+  text-align: center;
+  vertical-align: middle;
+}
+
+#contents a {
+}
+</style>
+<script type="text/javascript">
+    hljs.initHighlightingOnLoad();
+</script>
+</head>
+<body>
+<div id="header" >
+<div id="headersub">
+<h1>Adam Miller, Ryan Martino, Vince Bjazevic </h1>
+</div>
+</div>
+<div class="container">
+
+<h2>CS 470 : Project 1: Brain Machine Interface (BMI)</h2>
+
+<div style="float: right; padding: 20px">
+<img src="sensors.png" />
+<p style="font-size: 14px">Above shows an illustration of the multi-channel positional layouts for 52 channels.</p>
+</div>
+
+<p> 	As our final project we chose to work on classyfing signals gathered from an Electroencephloography (EEG) device. The data set we chose was Mental arithmetic (003-2014) from the Graz University of Technology. The data we classified fell into two catagories: Mental Arithmetic, and Rest.</p>
+
+<p>    The data set consisted of recordings from eight subjects undergoing three or four trials each (Subjects one, two, and three underwent three trials each, while the other subjects underwent four). Using light emitters and light sensors, this data recorded brain oxygenation in fifty-two channels during these trials. </p>
+
+<p>    We started our project by reviewing the MatLab Machine Learning Onramp (https://matlabacademy.mathworks.com/R2019b/portal.html?course=machinelearning), as it was recommended to us due to having good information regarding the processing of one-dimensional data. Due to the issues surrounding the midpoint of the semester, we had a very slow start which hampered us later on as we had less time later to complete the project than hoped.</p>
+
+<div style="clear:both">
+<h3>Method</h3>
+<img src="experiment.png" />
+<p> 	Above is an illistration of the experiment itself. The way the data was collected from the 8 subjects; each of the subjects were tasked with performing trials followed by consecutive rest periods for each trial. 2 seconds before the task started a green bar appeared on screen indicating the subjects get ready and the equipment would start recording. The subjects underwent 3-4 trials, each trial containing simple sequential subtraction problems. An example being 97 - 4, then 93 - 4 etc. After the experiment, the data complied to produce graphs depicting all 52 channels produced by the EEG. We then took that data and produced code to extract the listed 7 features below. By extracting 7 features from the 52 total channels, our end amount of features extracted was a 1092 total features.</p>
+
+<p>     Initially we did not use MatLab's built in function "fitcsvm" which did hamper our progress on the classification model. Below is the "fitcsvm statement.</p>
+    
+<pre><code>
+%fitcsvm statement
+mdl = fitcsvm(trainfeatures, trainclasses, 'Standardize', true, 'KernelFunction', 'rbf', 'OptimizeHyperparameters', auto);
+</code></pre>
+
+<p>     During the testing and training phase, seven subjects were used to train the svm and the one who was not included in the training was used to test the model. Initially the subjects being tested were chosen at random, but eventually cycled the testing position consecutively, through use of for loops. This change can attribute to an excessively long runtime. Below is an example plane of optimized hyperparameters for subject two,there are two parameters being tested for, KernelScale and BoxConstraint. It tests combinations (represented by blue dots) and finds the lowest estimated objective function value.
+</p>
+<center>
+<img src="unknown.png" />
+</center>
+<h2>Features</h2>
+Here is a list of features our code extracted, followed by a method of feature extraction:<p>
+<p>Statistical:</p>
+<ol>
+    <li>mean</li>
+    <li>standard deviation</li>
+    <li> skewness</li>
+    <li>kurtosis</li>
+</ol>
+<p>Hjorth descriptors:</p>
+<ol>
+    <li>activity</li>
+    <li>mobility</li>
+    <li>complexity</li>
+</ol>
+
+<pre><code>
+%Feature Extraction Code
+datachunk = readings(timestamps(b):timestamps(b+1),:);
+
+            featureActivity = var(datachunk);
+            dc1 = datachunk;
+            dc2 = datachunk;
+            for c = 2:size(datachunk,1)
+                dc1(c,:) = datachunk(c,:) - datachunk(c-1,:);
+            end
+            featureMobility = std(dc1)/std(datachunk);
+            for c = 3:size(datachunk,1)
+                dc2(c,:) = datachunk(c,:) - 2*datachunk(c-1,:) + datachunk(c-2,:);
+            end
+            featureFF = (std(dc2)/std(dc1))/(std(dc1)/std(datachunk));
+            featureMean = mean(datachunk);
+            featureKurtosis = kurtosis(datachunk);
+            featureSkewness = skewness(datachunk);
+            featureStd = std(datachunk);
+
+</code></pre>
+
+
+<h2>Results</h2>
+<center>
+<p>
+Here is the graph showing all 52 channels produced by Subject 2 during trial 1, without the sliding feature implimented.
+<p>
+<img src="Graphs/N21%20copy.png">
+<p>
+Subject 2 trial 1, with the sliding window implimented
+<p>
+<img src="Graphs/S21%20copy.png">
+<p>
+<h3>A table containing all subject and their (sliding/non-sliding) trials</h3>
+<table border=0 cellpadding=4 cellspacing=1>
+<tr>
+<th>Subject #</th>
+<th>Total Trials</th>
+<th colspan=2>Trial 1</th>
+<th colspan=2>Trial 2</th>
+<th colspan=2>Trial 3</th>
+<th colspan=2>Trial 4</th>
+</tr>
+<tr>
+<td>Subject 1</td>
+<td>3</td>
+<td bgcolor=LightBlue><img src="Graphs/N11.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S11.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N12.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S12.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N13.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S13.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><br><small>n/a</small></td>
+<td bgcolor=#FFBB55><br><small>n/a</small></td>
+</tr>
+<tr>
+<td>Subject 2</td>
+<td>3</td>
+<td bgcolor=LightBlue><img src="Graphs/N21.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S21.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N22.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S22.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N23.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S23.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><br><small>n/a</small></td>
+<td bgcolor=#FFBB55><br><small>n/a</small></td>
+</tr>
+<tr>
+<td>Subject 3</td>
+<td>3</td>
+<td bgcolor=LightBlue><img src="Graphs/N31.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S31.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N32.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S32.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N33.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S33.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><br><small>n/a</small></td>
+<td bgcolor=#FFBB55><br><small>n/a</small></td>
+</tr>
+<tr>
+<td>Subject 4</td>
+<td>4</td>
+<td bgcolor=LightBlue><img src="Graphs/N41.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S41.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N42.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S42.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N43.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S43.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/N44.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/S44.png" width=100 height=75><br><small>Sliding</small></td>
+</tr>
+<tr>
+<td>Subject 5</td>
+<td>4</td>
+<td bgcolor=LightBlue><img src="Graphs/N51.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S51.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N52.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S52.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N53.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S53.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/N54.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/S54.png" width=100 height=75><br><small>Sliding</small></td>
+</tr>
+<tr>
+<td>Subject 6</td>
+<td>4</td>
+<td bgcolor=LightBlue><img src="Graphs/N61.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S61.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N62.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S62.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N63.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S63.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/N64.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/S64.png" width=100 height=75><br><small>Sliding</small></td>
+</tr>
+<tr>
+<td>Subject 7</td>
+<td>4</td>
+<td bgcolor=LightBlue><img src="Graphs/N71.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S71.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N72.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S72.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N73.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S73.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/N74.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/S74.png" width=100 height=75><br><small>Sliding</small></td>
+</tr>
+<tr>
+<td>Subject 8</td>
+<td>4</td>
+<td bgcolor=LightBlue><img src="Graphs/N81.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightBlue><img src="Graphs/S81.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/N82.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightGreen><img src="Graphs/S82.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/N83.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=LightCoral><img src="Graphs/S83.png" width=100 height=75><br><small>Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/N84.png" width=100 height=75><br><small>Non-Sliding</small></td>
+<td bgcolor=#FFBB55><img src="Graphs/S84.png" width=100 height=75><br><small>Sliding</small></td>
+</tr>
+<tr>
+<th>Subject #</th>
+<th>Total Trials</th>
+<th colspan=2>Trial 1</th>
+<th colspan=2>Trial 2</th>
+<th colspan=2>Trial 3</th>
+<th colspan=2>Trail 4</th>
+</tr>
+</table>
+</center>
+<p>Overall our result, were recorded as follows: </p>
+<p>
+For no sliding window,
+the Average Accuracy is 0.8550,
+the Average Fscore is 0.9399,
+the Accuracy STD is 0.0917, and
+Fscore STD is 0.0526.
+</p>
+<p>
+For sliding window,
+the Average Accuracy is 0.5090,
+the Average Fscore is 0.7607,
+the Accuracy STD is 0.0596,
+the Fscore STD is 0.0662.
+</p>
+
+<h3>Conclusions</h3>
+<div style="clear:both" >
+<p> 	The issues we had with the Sliding Window approach, I think may have had to do with noise in the data. It's difficult to detect noise in EEG data as it is much less intuitive than image data. For example, in the Subject 6, Trial 4 data we can see a much lower reading at the beginning of the data, followed by a large spike at the end, which was present in many of the trials. We're not sure if this is noise, or legitimate data relating to waiting prior to the experiment and moving just afterwards.
+    In addition, we were not able to find a good window size to scan across the data with, which I believe meant that we had many radically different samples that the classifier could not properly train on.
+    In order to remedy this, a larger dataset, designed for this project and monitored for noise, would be helpful. Unfortunately we were unable to gather data ourselves and were limited to premade datasets findable online.
+    In addition, we saw a large discrepancy in accuracy between runs, even without implementing the sliding window. When used as a test, Subject 3, the highest, had an accuracy of .9444, while Subject 6, the lowest, had an accuracy of just .6875. This may be indicative of noise in Subject 6's data, but it may just be discrepancies between patients, or a different mindset upon exposure to the test on Subject 6's part. More research is needed to more accurately determine the differences in brain oxygenation between different subjects under the same conditions.
+    Still, with refinement, these findings show promising potential for using brain oxygenation to classify mental activity. This, coupled with more traditional EEG readings, could lead to more accurate, consistent results.
+</p>
+</div>
+</body>
+</html>
