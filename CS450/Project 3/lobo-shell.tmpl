@@ -1,0 +1,183 @@
+-------------------------------------------------------------------------------
+
+            +-------------------------+
+            | CS 450                  |
+            | PROJECT: LOBO SHELL     |
+            | DESIGN DOCUMENT         |
+            +-------------------------+
+
+---- GROUP ----
+
+>> Fill in the names and email addresses of your group members.
+
+Robert Sapien <sapien@sonoma.edu>
+Vince Bjazevic <bjazevic@sonoma.edu>
+Timothy Wu <wuti@sonoma.edu>
+
+---- PRELIMINARIES ----
+
+>> If you have any preliminary comments on your submission, notes for the
+>> TAs, or extra credit, please give them here.
+
+>> Please cite any offline or online sources you consulted while
+>> preparing your submission, other than the Pintos documentation, course
+>> text, lecture notes, and course staff.
+
+
+               LOBO SHELL
+               ==========
+
+---- DATA STRUCTURES ----
+
+>> A1: Copy here the declaration of each new `struct',
+>> `struct' member, global or static variable, `typedef', or
+>> enumeration.  Identify the purpose of each in 25 words or less.
+typedef struct args_cmds
+{
+
+    char* name;
+    int input_flag;
+    int output_flag;
+    char* input_file;
+    char* output_file;
+    char** arguments;
+    int total;
+
+} command;
+
+this struct is used to kep track of the commands from user input.
+
+
+---- ALGORITHMS ----
+
+>> A2: Unix pipes allow synchronization among processes to facilitate
+>> interprocess communication (IPC). Consider a pipeline of arbitrary 
+>> length, like:
+>>     P[0] | P[1] | ... | P[i-1] | P[i] | P[i+1] | ... | P[n]
+>> Imagine a loop, like:
+>>     for i in 0 .. n: 
+>>         set-up-pipeline-for( process P[i] )
+>> What prior-created pipes would be used with process P[i]? 
+The number of pipes that need to be created to set up P[i] is p[i] - 1.
+
+>> What new pipes need to be created to set up P[i]'s pipeline? 
+
+>> A3: Copy here the prototypes for any functions you have introduced.
+>> Identify the purpose of each in 50 words or less.
+void syserror( const char* s);
+syserror is used to handle errors that may occur in our project.
+
+int is_less(const char* line_words);
+is_less is used to chec a character to see if it is the less than sign for input.
+
+int is_pipe(const char* line_words);
+is_pipe is used to check a character to see if a command needs to be piped.
+
+int is_more(const char* line_words);
+is_more checks if a character is the more than symbol for redirecting output.
+
+int is_command(const char* line_words);
+is_comand checks characters for less than, more than, and pipe characters within the execute function.
+If a chacter is a command it is added to the list of commands.
+
+void execute(char* line_words[], int num_words);
+execute is where commands from user input are executed it handles the bulk of the workload in the project.
+
+void freeMem(command* cmds, int size);
+freeMem is used to deallocate memory for our struct.
+
+>> A4: Briefly describe how the functions (from A3) are called
+>> when your shell is processing the user-entered commands:
+>>   foo | bar
+In main our first call to a function we introduced is to execute it is passed the line_words array and num_words.
+In execute our first call to one of our functions is is_pipe to increment numPipes if we have any. If the next
+command is the newset, the next function is is_command it'll check line_words for a less than and greater than
+signs and will add the command to the struct while dynamically allocating space for it. If the command is not the
+newest it will use is_more, is_less, and is_pipe to set flags otherwise it will check the command for a file using
+is_command. At the the end of execute we will call freeMem to deallocate memory for the struct.
+>> A5: Briefly describe your approch for reaping child processes. When do 
+>> you reap, and how much do you reap at a time? Would it be possible to
+>> reap children earlier than your current implementation and, if so, 
+>> what situations might that benefit?
+We reap child processes at the end of execute and right before deallocating memory. We reap all of them at one time
+I do no think we can reap them any earlier.
+
+---- SYNCHRONIZATION ----
+
+>> A6: Does any aspect of our shell require multithreading or related
+>> synchronization primitives (locks, semaphores)? Is the bash shell
+>> (http://git.savannah.gnu.org/cgit/bash.git/) multithreaded?
+>> What did you grep to determine the answer?
+Our shell is multithreaded. In our execute function there are calls to wait() and pipe(). These commands alter the
+timeline of our project so they all finish together. To figure this out we used ps -e |grep lobo-shell.x | wc -l.
+
+---- RATIONALE ----
+
+>> A7: To open() a file for I/O re-direction requires file creation 
+>> flags and file permission modes be set. 
+>> List and explain the flag and status used in open(bar,...)
+>> for each of these situations:
+>>   (i) foo > bar
+>>  (ii) foo < bar
+>> (iii) foo >> bar
+>> Explain why you selected this default behavior, and compare it 
+>> to some existing shell you have used.
+(i)For '<' the flags and permissions that are set are  O_WRONLY, O_CREAT and O_TRUNC.
+(ii)For '>' the only flag and permission set is to O_RDONLY.
+(iii) For ">>" the flags and mermissions that are set are O_WRONLY, OCREAT, O_APPEND.
+
+>> A8: How does your implementation function in each of these scenarios:
+>>   (i) foo < bar, when "bar" does not exist?
+>>  (ii) foo > bar, when "bar" does not exist? 
+>> (iii) foo < bar, when "bar" exists but you lack permission to read it?
+>>  (iv) foo > bar, when "bar" exists but you lack permission to write it?
+>>   (v) foo > bar, when "bar" cannot be created?
+>> In each case, explain your design decision.
+(i)When "bar" does not exist we create more space for arguements at the location and store user input at the
+location[i]
+(ii)In the case of output we will create the file.
+(iii)When we lack the permissions to read from the input file we send an error message that reads "Error opening
+input file."
+(iv)When we lack the permissions to write to the output file we send an error message that reads "Error opening
+output file."
+(v)When we cannot create the output file we send an error message that reads "Error opening output file."
+
+>> A9: Develop a new test, not covered by existing tests. Provide the 
+>> code implementing that test. When possible, follow the format of 
+>> existing tests. Explain what functionality it tests and how it goes 
+>> beyond the provided tests.
+OUT=tests/output/`basename ${0%.sh}`.out
+EOUT=tests/output/`basename ${0%.sh}`.eout
+rm -f $OUT $EOUT tests/output/tmp tests/output/etmp
+
+./lobo_shell.x >$OUT << 'EOF'
+wc -l < /usr/share/dict/words > output.txt
+EOF
+
+wc -l < /usr/share/dict/words > output.txt > $EOUT
+
+diff $OUT $EOUT && echo "PASSED $0" || echo "TEST FAILED $0"
+
+This will test if we can redirect input back to output.
+
+
+               SURVEY QUESTIONS
+               ================
+
+Answering these questions is optional, but it will help us improve the
+course in future quarters.  Feel free to tell us anything you
+want--these questions are just to spur your thoughts.  You may also
+choose to respond anonymously in the course evaluations at the end of
+the quarter.
+
+>> In your opinion, was this assignment, or any one of the problems
+>> in it, too easy or too hard?  Did it take too long or too little time?
+
+>> Did you find that working on a particular part of the assignment gave
+>> you greater insight into some aspect of OS design?
+
+>> Is there some particular fact or hint we should give students in
+>> future quarters to help them solve the problems?  Conversely, did you
+>> find any of our guidance to be misleading?
+
+>> Any other comments?
