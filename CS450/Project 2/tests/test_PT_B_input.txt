@@ -1,0 +1,11 @@
+Welcome to PT-Sim-Clock, the enhanced page table simulator
+Using input file tests/PT_B.txt
+7   8   32
+['0', '1', '0', '0']
+['1', '1', '4', '0']
+['1', '1', '5', '1']
+['1', '1', '2', '0']
+virtual size:  7
+physical size:  8
+page size size:  32
+Type or 'quit' to leave the program
