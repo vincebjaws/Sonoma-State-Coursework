@@ -1,0 +1,308 @@
+
+# Author: Robert Sapien, Vince Bjazevic, Tim Wu
+# Date: 10/27/2020
+# Class: CS450
+# Assignment Description: This project performs virtual
+#address translation, and is expanded to simulate the 
+# Clock/SEcond Chance page replacement algorithm
+
+import sys, getopt, math
+
+#----------------------------------------------------------------#
+# Class to hold the page table elements
+#----------------------------------------------------------------#
+class Page_Table:
+    def __init__(self, infile):
+        self.vn = 0
+        self.pm = 0
+        self.pSize = 0
+        self.pages = []
+
+        file = open(infile, 'r')
+        
+        for x in file:
+            if x != '\n':
+                y = x.split()
+                self.pages.append(y)
+
+    #    print("V?: ", self.get_valid(3))
+    #    print("AB: ", self.get_access_bit(3))
+    #    print("FN: ", self.get_frame_num(3))
+    #    print("RU: ", self.get_recently_used(3))
+        print(self.pages)
+        first = False
+        second = False
+        for x in self.pages[0]:
+            if not first:
+                self.vn = int(x)
+                first = True
+                    
+            elif first and not second:
+                self.pm = int(x)
+                second = True
+                    
+            else:
+                self.pSize = int(x)
+
+
+
+    #----------------------------#
+    #----------------------------#
+    def print_data(self):
+        print("virtual size: ", self.vn)
+        print("physical size: ", self.pm)
+        print("page size size: ", self.pSize)
+
+    #----------------------------#
+    #----------------------------#
+
+   # def make_2D(self, r, c, n):
+#
+ #       rows, cols = (r, c)
+  #      arr = []
+#     for i in range(cols):
+ #           col = []
+  #          for j in range(rows):
+   #             col.append(0)
+    #        arr.append(col)
+     #   print(arr)
+
+        #----------------------------#
+    #----------------------------#
+    def print_Pages(self):
+        print(self.vn, ' ', self.pm, ' ', self.pSize)
+        for num in self.pages:
+            print(num)
+    
+    #----------------------------#
+    #----------------------------#
+    def get_Pages(self):
+        return self.pages
+
+    #----------------------------#
+    #----------------------------#
+    def get_virt(self):
+        return self.vn
+
+    #----------------------------#
+    #----------------------------#
+    def get_phys(self):
+        return self.pm
+
+    #----------------------------#
+    #----------------------------#
+    def get_size(self):
+        return self.pSize
+
+    def get_valid(self, row):
+        return self.pages[row][0]
+
+    def get_access_bit(self, row):
+        bin_conv = dec2bin(int(self.pages[row][1]))
+        return bin_conv
+
+    def get_frame_num(self, row):
+        return self.pages[row][2]
+
+    def get_recently_used(self, row):
+        return self.pages[row][3]
+
+#----------------------------------------------------------------#
+# Class to hold the page table elements
+#----------------------------------------------------------------#
+def help():
+    print("Usage:\n\n")
+    print("--help: Provides usage information for commands and arguments")
+    print("--verbose: provides extra information about what is being output")
+    print("--test: allows for tests to type conversions such as decimal to hex")
+    print("-c: sets clock flag to true")
+
+
+#----------------------------------------------------------------#
+# Class to hold the page table elements
+#----------------------------------------------------------------#    
+def check_args(argv):
+    try:
+        opts, args = getopt.getopt(argv, 'c', ['verbose', 'test', 'help'])
+
+    except getopt.GetoptError as err:
+        print(err)
+        sys.exit(2)
+
+    flags = [False, False, False]
+        
+    for opt, arg in opts:
+        if opt in ['--help']:
+            help()
+            
+        elif opt in ['--verbose']:
+            flags[0] = True
+            
+        elif opt in ['--test']:
+            flags[1] = True
+            
+        elif opt in ['-c']:
+            flags[2] = True
+
+    return flags
+
+#----------------------------------------------------------------#
+# If 'test' flag is true this function is called to test the
+# number conversion functions
+#----------------------------------------------------------------#
+def Test():
+
+    def info():
+        print("Type 'exit' to exit test mode and the program")
+        print("For more information about testing mode\ntype 'info'")
+        return
+
+    info()
+
+    h = False
+    d = False
+    
+    while True:
+        ins = input()
+        if ins.lower() == "exit":
+            print("Exiting...")
+            exit()
+
+        if ins.lower() == "info":
+            info()
+
+        if h:
+            print("binary: ", hex2bin(ins))
+            print("decimal: ", hex2dec(ins))
+            print("binary back to hexidecimal: ", bin2hex(ins))
+            
+        elif d:
+            print("binary: ", dec2bin(ins))
+            print("hexidecimal: ", dec2hex(ins))
+            print("binary back to decimal: ", bin2dec(ins))
+
+
+#----------------------------------------------------------------#
+# Number check & conversions: hex/dec/bin
+#----------------------------------------------------------------#
+def check_num(num):
+    if num[:1] == "0x":
+        h = "hex"
+        return h
+    else:
+        d = "dec"
+        return d
+
+def hex2dec(n):
+    return int(n, 16)
+    
+def dec2hex(n):
+    n = int(n, base=10)
+    return hex(n)
+    
+def hex2bin(n):
+    n = int(n, base=16)
+    return bin(n)
+
+def bin2hex(n):
+    n = int(n, base=2)
+    return hex(n)
+
+def bin2dec(n):
+    n = int(n, base=2)
+    return int(n)
+
+#def dec2bin(n):
+#    return bin(n)
+def dec2bin(n):
+    if n == 0:
+        return "000"
+    if n == 1:
+        return "001"
+    if n == 2:
+        return "010"
+    if n == 3:
+        return "011"
+    if n == 4:
+        return "100"
+    if n == 5:
+        return "101"
+    if n == 6:
+        return "110"
+    if n == 0:
+        return "111"
+
+#----------------------------------------------------------------#
+#Translate virtual address to physical address
+#----------------------------------------------------------------#
+def virtual2physical(pt, virt):
+    #physical = 0
+    numType = check_num(virt)
+    #print(numType)
+    pgSize = pt.get_size() 
+    virtSize = pt.get_virt()
+    #print(pgSize)
+    #print(virtSize)
+    indexSize = int(virtSize - math.log(pgSize, 2))
+    #print(indexSize)
+    if numType == "hex":
+        print("its a hex")
+        virtBin = hex2bin(virt)
+        append = virtBin[indexSize+2:]
+        virtBin = virtBin[2:indexSize]
+    else:
+        #print("its a decimal")
+        virtBin = hex2bin(dec2hex(virt))
+        print(virtBin)
+        append = virtBin[indexSize+2:]
+        virtBin = virtBin[2:indexSize]
+   # print(virtBin)    
+    index = bin2dec(virtBin)
+    print("this is index: ",index)
+    fn = pt.get_frame_num(index)
+    fn_bin = hex2bin(dec2hex(fn))
+    #print("this is pm: ",pm)
+    pages= pt.get_Pages()
+    if index <= 0 or index > len(pages):
+        if pm != 0:
+            return "DISK"
+        else:
+            return "SEGFAULT"
+    #physical whe fed the value 1676 is 0 this needs to be fixed
+    #append = virtBin[indexSize:]
+    print("this is append: ",append)
+    virt2phy = fn_bin + append
+    #print("this is virt2phy: ",virt2phy)
+    if numType == "hex":
+        physical = bin2hex(virt2phy)
+    else:
+        physical = bin2dec(virt2phy)
+    return physical
+
+
+
+#----------------------------------------------------------------#
+# Main function
+#----------------------------------------------------------------#
+def main(argv):
+
+    #### sets flags [0] = "verbose", [1] = "test", [2] = "c"
+    flags = check_args(argv)
+    
+    infile = argv[-1]
+    if flags[0]: print("infile: ", infile)
+
+    if flags[0]: print("reading in file...")
+    pTable = Page_Table(infile)
+
+    
+    
+    pTable.print_Pages()
+    pTable.print_data()
+    #print(pTable.get_virt())
+    #print(pTable.get_size())
+    print("this is the physical address: ",virtual2physical(pTable, "561"))
+    return
+
+if __name__ == "__main__":
+    main(sys.argv[1:])
