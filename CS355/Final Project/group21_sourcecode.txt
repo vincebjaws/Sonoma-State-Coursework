@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<title>Airline Database CS355 Term Project</title>
+<head>
+<title>Airline Database CS355 Term Project</title>
+
+<body background="http://blue.cs.sonoma.edu/~bjazevic/clouds.jpg">
+
+<h1 align="center">
+	<div id= "pgTitle">AIRPORT DATA</div>
+</h1>
+
+
+<div id = 'AttrList'>
+	<h3>Decomposion List</h3>
+<ul>
+	<li>Airlines</li>
+	<li>Airports</li>
+	<li>Flights</li>
+
+</ul>
+</div>
+
+<form action= "server.php" method="post">
+	Query Input: <input type="text" name="value">
+	<input type="submit">
+</form>
+
+<div id = 'TextInput'>
+
+<?php
+$dbconn = pg_connect("host=blue.cs.sonoma.edu dbname=cs355gp21f19 user=bjazevic password=***********")
+    or die('Could not connect: ' . pg_last_error());
+
+if(isset($_POST['value'])){
+	$query = $_POST['value'];
+    
+    
+    
+	$drop = "drop table";
+	$insert = "insert into";
+	$update = "update";
+	$errorInQuery = False;
+    
+    if( stripos( $query, $drop ) !== false) {
+        $errorInQuery = true;
+    }
+    if( stripos( $query, $insert ) !== false) {
+        $errorInQuery = true;
+    }
+    if( stripos( $query, $update ) !== false) {
+        $errorInQuery = true;
+    }
+    
+   
+    
+    if($errorInQuery){
+        echo "Error in Query: invalid Operation";
+    } else {
+        $result = pg_query($dbconn, $query)
+        or die('Query failed: ' . pg_last_error());
+    }
+}
+
+    
+echo "<table border=\"1\">\n";
+    
+    $i = 0;
+    
+    while($i < pg_num_fields($result)){
+        $fieldName = pg_field_name($result, $i);
+        echo '<th>' . $fieldName . '</th>';
+        $i = $i + 1;
+    }
+while ($line = pg_fetch_array($result, null, PGSQL_ASSOC)) {
+    
+    echo "\t<tr>\n";
+    foreach ($line as $col_value) {
+    
+        echo "\t\t<td>$col_value</td>\n";
+    
+    }
+    echo "\t</tr>\n";
+}
+echo "</table>\n";
+pg_free_result($result);
+pg_close($dbconn);
+?>
+</div>
+
+
+
+</div>
+<div id = 'table'/>
+	<p1>
+		
+	</p1>
+</div>
+
+</body>
+</html>
