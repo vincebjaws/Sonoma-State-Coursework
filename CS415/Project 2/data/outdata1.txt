@@ -1,0 +1,4 @@
+There are 3 clients in this file
+Printing topological sort:
+2 1 3
+Printing optimal:
