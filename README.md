@@ -10,4 +10,4 @@ Courses:
   - CS 450: Operating Systems
   - CS 454: Theory of Computation
   - CS 460: Programming Languages
-  - CS 470: Advanced Software Design Project
+  - CS 470: Advanced Software Design Project (EEG Project)
