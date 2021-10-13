@@ -4,6 +4,7 @@ Courses:
   - CS 210: Introduction to Unix (Unix, Linux)
   - CS 215: Programming 2; Intro into C++ (C++, Python)
   - CS 315: Data Structures (C++)
+  - CS 370: Software Design and Development (Git, GitHub)
   - CS 375: Intro web devolpement (Can be found on my codeSandbox)
   - CS 355: Database Management Systems Design (SQL, HTML)
   - CS 415: Algorithm Analysis (C++, Python)
