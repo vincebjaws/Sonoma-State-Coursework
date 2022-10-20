@@ -2,7 +2,7 @@
 # This is Python code for representing finite automata, DFAs and NFAs,
 # and for converting from an NFA into a DFA.
 #
-# Ben Reichardt, 1/17/2011
+# Ben Reichardt, Spencer Coneley, Vince Bjazevic 1/17/2020
 #
 
 class DFA:
